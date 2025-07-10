@@ -14,6 +14,10 @@ A simple web app to check current weather and a 5-day forecast for any city, usi
 
 
 
+https://github.com/user-attachments/assets/87cc6879-bba5-46f9-91b1-1a502a5f2234
+
+
+
 ⚙️ How It Works
 1️⃣ User types a city name in the input box 🏙️
 2️⃣ Clicks the Search button 🔍
