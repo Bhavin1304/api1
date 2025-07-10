@@ -1,0 +1,56 @@
+const apiKey = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+
+document.getElementById('search-btn').addEventListener('click', () => {
+  const city = document.getElementById('cityInput').value.trim();
+  if (city !== '') {
+    getWeather(city);
+  }
+});
+
+async function getWeather(city) {
+  try {
+    // Current weather
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+    );
+    const data = await res.json();
+
+    document.getElementById('city-name').textContent = data.name;
+    document.getElementById('temp').textContent = `${Math.round(data.main.temp)}°C`;
+    document.getElementById('weather-desc').textContent = data.weather[0].description;
+    document.getElementById('details').innerHTML = `
+      <p>Feels like: ${Math.round(data.main.feels_like)}°C</p>
+      <p>Humidity: ${data.main.humidity}%</p>
+      <p>Wind: ${Math.round(data.wind.speed * 3.6)} km/h</p>
+    `;
+
+    // Forecast
+    const forecastRes = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`
+    );
+    const forecastData = await forecastRes.json();
+    const forecastContainer = document.getElementById('forecast');
+    forecastContainer.innerHTML = '';
+
+    // Filter for one forecast per day at 12:00
+    const dailyData = forecastData.list.filter(item => item.dt_txt.includes('12:00:00'));
+
+    dailyData.forEach(item => {
+      const date = new Date(item.dt_txt);
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+      const icon = `<img src="https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png" alt="">`;
+      forecastContainer.innerHTML += `
+        <div class="day">
+          <p>${dayName}</p>
+          <div class="icon">${icon}</div>
+          <p>${Math.round(item.main.temp_max)}° - ${Math.round(item.main.temp_min)}°</p>
+          <p>${item.weather[0].description}</p>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.error(err);
+    alert('Could not fetch weather data. Please check the city name.');
+  }
+}
